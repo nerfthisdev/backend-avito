@@ -57,7 +57,7 @@ jobs:
         run: go install github.com/pressly/goose/v3/cmd/goose@latest
 
       - name: Run migrations
-        run: goose -dir ./migrations up
+        run: goose -dir ./migrations postgres ${DB_DSN_TEST} up
 
       - name: Run tests
         run: go test ./...

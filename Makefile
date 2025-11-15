@@ -7,7 +7,7 @@ DB_DSN ?= postgres://admin:admin@localhost:5432/avito_db?sslmode=disable
 MIGRATIONS_DIR := ./migrations
 GOOSE_TABLE    := goose_migrations
 
-GOOSE_CMD := goose -dir $(MIGRATIONS_DIR) -table $(GOOSE_TABLE) postgres "$(DB_DSN)"
+GOOSE_CMD := goose"
 
 APP_NAME := pr-assigner
 OUT_DIR := bin
@@ -35,15 +35,15 @@ db-down:
 
 .PHONY: migrate-up
 migrate-up:
-	$(GOOSE_CMD) up
+	goose up
 
 .PHONY: migrate-down
 migrate-down:
-	$(GOOSE_CMD) down
+	goose down
 
 .PHONY: migrate-status
 migrate-status:
-	$(GOOSE_CMD) status
+	goose status
 
 .PHONY: migrate-new
 migrate-new:

@@ -24,6 +24,7 @@ help:
 	@echo "make dev          - run air (live reload)"
 	@echo "make build	 - builds go binary"
 	@echo "make clean	 - cleans build directory"
+	@echo "make test	 - runs all tests"
 
 .PHONY: db-up
 db-up:
@@ -65,3 +66,8 @@ build:
 .PHONY: clean
 clean:
 	rm -rf $(OUT_DIR) tmp
+
+.PHONY: test
+test:
+	go test ./...
+

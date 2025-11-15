@@ -9,14 +9,15 @@ import (
 
 	"github.com/nerfthisdev/backend-avito/internal/domain"
 	"github.com/nerfthisdev/backend-avito/internal/repository"
+	"github.com/nerfthisdev/backend-avito/test/integration/testutil"
 )
 
 func TestTeamRepo_CreateAndGet(t *testing.T) {
 	ctx := context.Background()
-	pool := newTestPool(t)
+	pool := testutil.NewTestPool(t)
 	defer pool.Close()
 
-	resetDB(t, pool)
+	testutil.ResetDB(t, pool)
 
 	repo := repository.NewTeamRepo(pool)
 
@@ -48,10 +49,10 @@ func TestTeamRepo_CreateAndGet(t *testing.T) {
 
 func TestTeamRepo_CreateTeam_Duplicate(t *testing.T) {
 	ctx := context.Background()
-	pool := newTestPool(t)
+	pool := testutil.NewTestPool(t)
 	defer pool.Close()
 
-	resetDB(t, pool)
+	testutil.ResetDB(t, pool)
 
 	repo := repository.NewTeamRepo(pool)
 	team := domain.Team{

@@ -10,14 +10,15 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/nerfthisdev/backend-avito/internal/domain"
 	"github.com/nerfthisdev/backend-avito/internal/repository"
+	"github.com/nerfthisdev/backend-avito/test/integration/testutil"
 )
 
 func TestUserRepo_GetByID(t *testing.T) {
 	ctx := context.Background()
-	pool := newTestPool(t)
+	pool := testutil.NewTestPool(t)
 	defer pool.Close()
 
-	resetDB(t, pool)
+	testutil.ResetDB(t, pool)
 
 	const teamName = "backend"
 	mustInsertTeam(t, pool, teamName)
@@ -43,10 +44,10 @@ func TestUserRepo_GetByID(t *testing.T) {
 
 func TestUserRepo_GetByID_NotFound(t *testing.T) {
 	ctx := context.Background()
-	pool := newTestPool(t)
+	pool := testutil.NewTestPool(t)
 	defer pool.Close()
 
-	resetDB(t, pool)
+	testutil.ResetDB(t, pool)
 
 	repo := repository.NewUserRepo(pool)
 	_, err := repo.GetByID(ctx, "missing")
@@ -57,10 +58,10 @@ func TestUserRepo_GetByID_NotFound(t *testing.T) {
 
 func TestUserRepo_SetIsActive(t *testing.T) {
 	ctx := context.Background()
-	pool := newTestPool(t)
+	pool := testutil.NewTestPool(t)
 	defer pool.Close()
 
-	resetDB(t, pool)
+	testutil.ResetDB(t, pool)
 
 	const teamName = "backend"
 	mustInsertTeam(t, pool, teamName)
@@ -92,10 +93,10 @@ func TestUserRepo_SetIsActive(t *testing.T) {
 
 func TestUserRepo_SetIsActive_NotFound(t *testing.T) {
 	ctx := context.Background()
-	pool := newTestPool(t)
+	pool := testutil.NewTestPool(t)
 	defer pool.Close()
 
-	resetDB(t, pool)
+	testutil.ResetDB(t, pool)
 
 	repo := repository.NewUserRepo(pool)
 	_, err := repo.SetIsActive(ctx, "missing", false)

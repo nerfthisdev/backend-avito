@@ -18,7 +18,7 @@ import (
 )
 
 func main() {
-	godotenv.Load()
+	_ = godotenv.Load()
 
 	cfg := logger.Config{Env: "DEV", Level: ""}
 

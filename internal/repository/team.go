@@ -5,7 +5,7 @@ import (
 	"errors"
 
 	"github.com/jackc/pgerrcode"
-	"github.com/jackc/pgx"
+	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/nerfthisdev/backend-avito/internal/domain"
 )
@@ -29,7 +29,7 @@ func (r *TeamRepo) CreateTeam(ctx context.Context, team domain.Team) error {
 	_, err = tx.Exec(ctx,
 		`INSERT INTO teams (name) VALUES ($1)`, team.Name)
 	if err != nil {
-		var pgErr pgx.PgError
+		var pgErr *pgconn.PgError
 		if errors.As(err, &pgErr) && pgErr.Code == pgerrcode.UniqueViolation {
 			return ErrTeamExists
 		}

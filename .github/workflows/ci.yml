@@ -1,8 +1,8 @@
-name: Lint 
+name: Lint & Test
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [ main, develop, feature/* ]
   pull_request:
     branches: [ main, develop ]
 
@@ -21,4 +21,44 @@ jobs:
 
       - name: Golangci-lint
         uses: golangci/golangci-lint-action@v9.0.0
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: admin
+          POSTGRES_PASSWORD: admin
+          POSTGRES_DB: avito_test_db
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U admin -d avito_test_db"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
+    env:
+      DB_DSN_TEST: postgres://admin:admin@localhost:5432/avito_test_db?sslmode=disable
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.25"
+
+      - name: Download go modules
+        run: go mod download
+
+      - name: Install goose
+        run: go install github.com/pressly/goose/v3/cmd/goose@latest
+
+      - name: Run migrations
+        run: goose -dir ./migrations up
+
+      - name: Run tests
+        run: go test ./...
 

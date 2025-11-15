@@ -1,0 +1,32 @@
+
+[build]
+ cmd = "go build -o tmp/service cmd/service/main.go"
+ bin = "tmp/service"
+ include_ext = ["go"]
+ exclude_dir = ["vendor"]
+ run_after_build = "chmod -x main"
+
+[color]
+main = "magenta"
+watcher = "cyan"
+build = "yellow"
+runner = "green"
+
+
+[log]
+  level = "debug"
+  main_only = false
+  silent = false
+  time = false
+
+[misc]
+  clean_on_exit = false
+
+[proxy]
+  app_port = 0
+  enabled = false
+  proxy_port = 0
+
+[screen]
+  clear_on_rebuild = false
+  keep_scroll = true

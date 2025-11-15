@@ -1,6 +1,6 @@
 //go:build integration
 
-package repository_test
+package testutil
 
 import (
 	"context"
@@ -10,7 +10,8 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-func resetDB(t *testing.T, pool *pgxpool.Pool) {
+// ResetDB truncates all tables to give tests a clean state.
+func ResetDB(t *testing.T, pool *pgxpool.Pool) {
 	t.Helper()
 
 	ctx := context.Background()
@@ -25,7 +26,8 @@ func resetDB(t *testing.T, pool *pgxpool.Pool) {
 	}
 }
 
-func newTestPool(t *testing.T) *pgxpool.Pool {
+// NewTestPool opens a pgx pool using DB_DSN_TEST.
+func NewTestPool(t *testing.T) *pgxpool.Pool {
 	t.Helper()
 
 	dsn := os.Getenv("DB_DSN_TEST")

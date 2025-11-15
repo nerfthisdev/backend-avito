@@ -59,6 +59,8 @@ jobs:
       - name: Run migrations
         run: goose -dir ./migrations postgres ${DB_DSN_TEST} up
 
-      - name: Run tests
-        run: go test ./...
+      - name: Run unit tests
+        run: make test
 
+      - name: Run integration tests
+        run: make test-integration

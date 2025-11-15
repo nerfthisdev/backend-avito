@@ -53,6 +53,11 @@ make clean  # removes ./bin and ./tmp artifacts
 make test  # runs go test ./...
 ```
 
+Integration tests (require DB + `DB_DSN_TEST`):
+```bash
+go test -tags integration ./test/integration/...
+```
+
 ### Command reference
 ```bash
 make help  # prints the summary of available targets

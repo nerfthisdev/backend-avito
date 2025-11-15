@@ -24,7 +24,8 @@ help:
 	@echo "make dev          - run air (live reload)"
 	@echo "make build	 - builds go binary"
 	@echo "make clean	 - cleans build directory"
-	@echo "make test	 - runs all tests"
+	@echo "make test	 - runs unit tests"
+	@echo "make test-integration - runs integration tests (requires DB_DSN_TEST)"
 
 .PHONY: db-up
 db-up:
@@ -71,3 +72,6 @@ clean:
 test:
 	go test ./...
 
+.PHONY: test-integration
+test-integration:
+	go test -tags integration ./test/integration/...

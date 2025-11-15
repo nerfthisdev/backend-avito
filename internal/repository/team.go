@@ -24,7 +24,7 @@ func (r *TeamRepo) CreateTeam(ctx context.Context, team domain.Team) error {
 		return err
 	}
 
-	defer tx.Rollback(ctx)
+	defer func() { _ = tx.Rollback(ctx) }()
 
 	_, err = tx.Exec(ctx,
 		`INSERT INTO teams (name) VALUES ($1)`, team.Name)

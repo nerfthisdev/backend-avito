@@ -19,7 +19,7 @@ func NewUserHandlers(svc *service.UserService, log *zap.Logger) *UserHandlers {
 	return &UserHandlers{svc: svc, log: log}
 }
 
-func (h *UserHandlers) Register(mux *http.ServeMux) {
+func (h *UserHandlers) RegisterRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("POST /users/setIsActive", h.handleSetIsActive)
 }
 

@@ -30,3 +30,16 @@ type PullRequest struct {
 	CreatedAt         time.Time
 	MergedAt          *time.Time
 }
+
+var (
+	ErrPullRequestExists = ErrWithCode{"PR_EXISTS"}
+	ErrPullRequestMerged = ErrWithCode{"PR_MERGED"}
+	ErrNotAssigned       = ErrWithCode{"NOT_ASSIGNED"}
+	ErrNoCandidate       = ErrWithCode{"NO_CANDIDATE"}
+)
+
+type ErrWithCode struct {
+	Code string
+}
+
+func (e ErrWithCode) Error() string { return e.Code }

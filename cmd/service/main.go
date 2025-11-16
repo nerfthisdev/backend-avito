@@ -70,11 +70,9 @@ func main() {
 	teamSvc := service.NewTeamService(teamRepo)
 	userSvc := service.NewUserService(userRepo)
 	prSvc := service.NewPullRequestService(prRepo, userRepo)
-	_ = prSvc
-	_ = userSvc
 
 	teamHandlers := httpapi.NewTeamHandler(teamSvc, logg)
-	userHandlers := httpapi.NewUserHandlers(userSvc, logg)
+	userHandlers := httpapi.NewUserHandlers(userSvc, prSvc, logg)
 	mux := http.NewServeMux()
 
 	userHandlers.RegisterRoutes(mux)

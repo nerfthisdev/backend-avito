@@ -11,16 +11,18 @@ import (
 )
 
 type UserHandlers struct {
-	svc *service.UserService
-	log *zap.Logger
+	svc   *service.UserService
+	prSvc *service.PullRequestService
+	log   *zap.Logger
 }
 
-func NewUserHandlers(svc *service.UserService, log *zap.Logger) *UserHandlers {
-	return &UserHandlers{svc: svc, log: log}
+func NewUserHandlers(svc *service.UserService, prSvc *service.PullRequestService, log *zap.Logger) *UserHandlers {
+	return &UserHandlers{svc: svc, prSvc: prSvc, log: log}
 }
 
 func (h *UserHandlers) RegisterRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("POST /users/setIsActive", h.handleSetIsActive)
+	mux.HandleFunc("GET /users/getReview", h.handleGetReview)
 }
 
 func (h *UserHandlers) handleSetIsActive(w http.ResponseWriter, r *http.Request) {
@@ -64,5 +66,32 @@ func (h *UserHandlers) handleSetIsActive(w http.ResponseWriter, r *http.Request)
 		User: userdto,
 	}
 
+	_ = json.NewEncoder(w).Encode(resp)
+}
+
+func (h *UserHandlers) handleGetReview(w http.ResponseWriter, r *http.Request) {
+	userID := r.URL.Query().Get("user_id")
+	if userID == "" {
+		writeError(w, http.StatusBadRequest, "BAD_REQUEST", "user_id is required")
+		return
+	}
+
+	prs, err := h.prSvc.ListReviewerPRs(r.Context(), userID)
+	if err != nil {
+		h.log.Error("failed to list reviewer pull requests", zap.String("user_id", userID), zap.Error(err))
+		writeError(w, http.StatusInternalServerError, "INTERNAL", "internal error")
+		return
+	}
+
+	resp := struct {
+		UserID       string                    `json:"user_id"`
+		PullRequests []dto.PullRequestShortDTO `json:"pull_requests"`
+	}{
+		UserID:       userID,
+		PullRequests: dto.PullRequestsShortToDTO(prs),
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
 	_ = json.NewEncoder(w).Encode(resp)
 }

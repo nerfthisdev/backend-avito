@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"math/rand"
+	"slices"
 	"time"
 
 	"github.com/nerfthisdev/backend-avito/internal/apperror"
@@ -162,10 +163,5 @@ func (s *PullRequestService) chooseReviewers(users []domain.User, exclude map[st
 }
 
 func containsReviewer(reviewers []string, target string) bool {
-	for _, id := range reviewers {
-		if id == target {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(reviewers, target)
 }

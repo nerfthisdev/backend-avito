@@ -1,6 +1,11 @@
 package domain
 
-import "time"
+import (
+	"errors"
+	"time"
+
+	"github.com/nerfthisdev/backend-avito/internal/apperror"
+)
 
 type Team struct {
 	Name    string
@@ -30,3 +35,10 @@ type PullRequest struct {
 	CreatedAt         time.Time
 	MergedAt          *time.Time
 }
+
+var (
+	ErrPullRequestExists = apperror.New(apperror.CodePullReqExists, errors.New("pull request already exists"))
+	ErrPullRequestMerged = apperror.New(apperror.CodePullReqMerged, errors.New("pull request already merged"))
+	ErrNotAssigned       = apperror.New(apperror.CodeNotAssigned, errors.New("reviewer is not assigned to this PR"))
+	ErrNoCandidate       = apperror.New(apperror.CodeNoCandidate, errors.New("no active replacement candidate in team"))
+)

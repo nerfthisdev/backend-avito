@@ -24,6 +24,10 @@ func main() {
 
 	port := os.Getenv("SERVICE_PORT")
 
+	if port == "" {
+		port = "8080"
+	}
+
 	logg, err := logger.New(cfg)
 	if err != nil {
 		panic("couldnt initialize zap logger")
@@ -60,11 +64,21 @@ func main() {
 	// DI
 
 	teamRepo := repository.NewTeamRepo(pool)
-	teamSvc := service.NewTeamService(teamRepo)
-	teamHandlers := httpapi.NewTeamHandler(teamSvc, logg)
+	userRepo := repository.NewUserRepo(pool)
+	prRepo := repository.NewPullRequestRepo(pool)
 
+	teamSvc := service.NewTeamService(teamRepo)
+	userSvc := service.NewUserService(userRepo)
+	prSvc := service.NewPullRequestService(prRepo, userRepo)
+
+	teamHandlers := httpapi.NewTeamHandler(teamSvc, logg)
+	userHandlers := httpapi.NewUserHandlers(userSvc, prSvc, logg)
+	prHandlers := httpapi.NewPullRequestHandlers(prSvc, logg)
 	mux := http.NewServeMux()
+
+	userHandlers.RegisterRoutes(mux)
 	teamHandlers.RegisterRoutes(mux)
+	prHandlers.RegisterRoutes(mux)
 
 	srv := &http.Server{
 		Addr:    ":" + port,

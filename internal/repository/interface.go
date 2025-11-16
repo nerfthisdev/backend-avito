@@ -22,6 +22,7 @@ type TeamRepository interface {
 type UserRepository interface {
 	GetByID(ctx context.Context, id string) (*domain.User, error)
 	SetIsActive(ctx context.Context, id string, active bool) (*domain.User, error)
+	ListActiveByTeam(ctx context.Context, teamName string) ([]domain.User, error)
 }
 
 type PullRequestRepository interface {

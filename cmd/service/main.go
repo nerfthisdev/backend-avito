@@ -73,10 +73,12 @@ func main() {
 
 	teamHandlers := httpapi.NewTeamHandler(teamSvc, logg)
 	userHandlers := httpapi.NewUserHandlers(userSvc, prSvc, logg)
+	prHandlers := httpapi.NewPullRequestHandlers(prSvc, logg)
 	mux := http.NewServeMux()
 
 	userHandlers.RegisterRoutes(mux)
 	teamHandlers.RegisterRoutes(mux)
+	prHandlers.RegisterRoutes(mux)
 
 	srv := &http.Server{
 		Addr:    ":" + port,

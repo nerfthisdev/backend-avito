@@ -136,17 +136,20 @@ func newUserHandlerFixture(t *testing.T) *userHandlerFixture {
 	t.Cleanup(pool.Close)
 	testutil.ResetDB(t, pool)
 
-	repo := repository.NewUserRepo(pool)
-	svc := service.NewUserService(*repo)
-	handlers := httpapi.NewUserHandlers(svc, zap.NewNop())
+	userRepo := repository.NewUserRepo(pool)
+	prRepo := repository.NewPullRequestRepo(pool)
+
+	userSvc := service.NewUserService(userRepo)
+	prSvc := service.NewPullRequestService(prRepo, userRepo)
+	handlers := httpapi.NewUserHandlers(userSvc, prSvc, zap.NewNop())
 
 	mux := http.NewServeMux()
-	handlers.Register(mux)
+	handlers.RegisterRoutes(mux)
 
 	return &userHandlerFixture{
 		t:    t,
 		pool: pool,
-		repo: repo,
+		repo: userRepo,
 		mux:  mux,
 	}
 }

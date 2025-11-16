@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/nerfthisdev/backend-avito/internal/apperror"
 	"github.com/nerfthisdev/backend-avito/internal/http/dto"
 	"github.com/nerfthisdev/backend-avito/internal/service"
 	"go.uber.org/zap"
@@ -40,9 +41,9 @@ func (h *UserHandlers) handleSetIsActive(w http.ResponseWriter, r *http.Request)
 
 	user, err := h.svc.SetIsActive(r.Context(), req.UserID, req.IsActive)
 	if err != nil {
-		if derr, ok := err.(*service.DomainError); ok {
-			if derr.Code == service.ErrCodeNotFound {
-				writeError(w, http.StatusNotFound, "NOT_FOUND", "user not found")
+		if code, ok := apperror.CodeOf(err); ok {
+			if code == apperror.CodeNotFound {
+				writeError(w, http.StatusNotFound, string(code), "user not found")
 				return
 			}
 		}

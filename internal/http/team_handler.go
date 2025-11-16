@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/nerfthisdev/backend-avito/internal/apperror"
 	"github.com/nerfthisdev/backend-avito/internal/http/dto"
 	"github.com/nerfthisdev/backend-avito/internal/service"
 	"go.uber.org/zap"
@@ -33,15 +34,16 @@ func (h *TeamHandlers) handleCreateTeam(w http.ResponseWriter, r *http.Request) 
 
 	if err := dec.Decode(&teamdto); err != nil {
 		writeError(w, http.StatusBadRequest, "BAD_REQUEST", "invalid JSON body")
+		return
 	}
 
 	team := dto.TeamFromDTO(teamdto)
 
 	if err := h.svc.CreateTeam(r.Context(), team); err != nil {
-		if derr, ok := err.(*service.DomainError); ok {
-			switch derr.Code {
-			case service.ErrCodeTeamExists:
-				writeError(w, http.StatusBadRequest, service.ErrCodeTeamExists, "team_name already exists")
+		if code, ok := apperror.CodeOf(err); ok {
+			switch code {
+			case apperror.CodeTeamExists:
+				writeError(w, http.StatusBadRequest, string(code), "team_name already exists")
 				return
 			}
 		}
@@ -71,10 +73,9 @@ func (h *TeamHandlers) handleGetTeam(w http.ResponseWriter, r *http.Request) {
 
 	team, err := h.svc.GetTeam(r.Context(), teamName)
 	if err != nil {
-		if derr, ok := err.(*service.DomainError); ok {
-			if derr.Code == service.ErrCodeNotFound {
-
-				writeError(w, http.StatusNotFound, "NOT_FOUND", "team not found")
+		if code, ok := apperror.CodeOf(err); ok {
+			if code == apperror.CodeNotFound {
+				writeError(w, http.StatusNotFound, string(code), "team not found")
 				return
 			}
 		}

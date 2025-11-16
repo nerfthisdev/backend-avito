@@ -11,6 +11,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/nerfthisdev/backend-avito/internal/apperror"
 	httpapi "github.com/nerfthisdev/backend-avito/internal/http"
 	"github.com/nerfthisdev/backend-avito/internal/http/dto"
 	"github.com/nerfthisdev/backend-avito/internal/repository"
@@ -78,8 +79,8 @@ func TestTeamHandler_CreateTeam_Duplicate(t *testing.T) {
 	if err := json.NewDecoder(resp.Body).Decode(&errBody); err != nil {
 		t.Fatalf("decode error body: %v", err)
 	}
-	if errBody.Error.Code != service.ErrCodeTeamExists {
-		t.Fatalf("error code = %s, want %s", errBody.Error.Code, service.ErrCodeTeamExists)
+	if errBody.Error.Code != string(apperror.CodeTeamExists) {
+		t.Fatalf("error code = %s, want %s", errBody.Error.Code, apperror.CodeTeamExists)
 	}
 }
 

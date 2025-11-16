@@ -24,6 +24,10 @@ func main() {
 
 	port := os.Getenv("SERVICE_PORT")
 
+	if port == "" {
+		port = "8080"
+	}
+
 	logg, err := logger.New(cfg)
 	if err != nil {
 		panic("couldnt initialize zap logger")

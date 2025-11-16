@@ -2,6 +2,49 @@
 
 [![lint](https://github.com/nerfthisdev/backend-avito/actions/workflows/ci.yml/badge.svg)](https://github.com/nerfthisdev/backend-avito/actions/workflows/ci.yml)
 
+
+
+
+## Load testing
+
+
+Я тестировал с помощью k6, сценарий можете увидеть в папке loadtest
+
+Tool: k6  
+Scenario: 10 VUs, 1 minute, ~274 HTTP RPS (≈ 50x higher than target RPS=5).
+
+Each iteration:
+- POST /team/add (idempotent, may return 201 or 400 TEAM_EXISTS)
+- POST /pullRequest/create (may return 201 or 409 PR_EXISTS)
+- POST /pullRequest/merge (idempotent, returns 200)
+
+Results:
+- Total iterations: 5490 (~91/s)
+- Total HTTP requests: 16470 (~274/s)
+
+Latency (http_req_duration):
+- avg:   2.84 ms
+- p95:   7.53 ms
+- max:  16.97 ms
+
+Checks:
+- 100% of functional checks passed:
+- team.add is 201 or 400
+- pr.create is 201 or 409
+- pr.merge is 200
+
+### Notes
+ - k6 сообщает `http_req_failed ≈ 62%`, так как считает все ответы `4xx` ошибками.
+ - В данном сценарии статусы `400 TEAM_EXISTS` и `409 PR_EXISTS` являются **ожидаемыми доменными результатами**, возникающими при многократных запросах с одинаковыми идентификаторами.
+ - Эти ответы корректно обрабатываются, что подтверждается **100% успешных checks**.
+ - Не было получено ни одного неожиданного `5xx` или сетевых ошибок.
+
+### Conclusion
+ - Даже при нагрузке **примерно в 50 раз выше требуемой**, сервис остаётся значительно быстрее SLI-порога в **300 мс**: показатель **p95 < 10 мс**.
+ - Функциональное поведение полностью корректно (checks = 100%).
+ - Сервис демонстрирует значительный запас производительности и готов к эксплуатации в условиях заявленной нагрузки.
+
+
 ## Local Setup
 
 ### Requirements
@@ -25,6 +68,14 @@ GOOSE_TABLE=goose_migrations
 ```
 
 ## Workflows
+
+### Docker Compose (full service)
+
+```bash
+docker compose up --build
+```
+
+This builds the service image, runs Postgres, applies all migrations automatically, and exposes the HTTP API on `localhost:8080`. Stop everything with `docker compose down`.
 
 ### Database & migrations
 ```bash

@@ -29,11 +29,11 @@ help:
 
 .PHONY: db-up
 db-up:
-	docker compose up -d
+	docker compose up -d db
 
 .PHONY: db-down
 db-down:
-	docker compose down
+	docker compose stop db
 
 .PHONY: migrate-up
 migrate-up:
@@ -75,3 +75,7 @@ test:
 .PHONY: test-integration
 test-integration:
 	go test -tags integration ./test/integration/...
+
+.PHONY: loadtest
+loadtest:
+	k6 run loadtest/scenario.js

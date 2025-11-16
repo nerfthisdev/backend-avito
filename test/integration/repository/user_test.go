@@ -7,7 +7,6 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/nerfthisdev/backend-avito/internal/domain"
 	"github.com/nerfthisdev/backend-avito/internal/repository"
 	"github.com/nerfthisdev/backend-avito/test/integration/testutil"
@@ -102,27 +101,5 @@ func TestUserRepo_SetIsActive_NotFound(t *testing.T) {
 	_, err := repo.SetIsActive(ctx, "missing", false)
 	if !errors.Is(err, repository.ErrNotFound) {
 		t.Fatalf("expected ErrNotFound, got %v", err)
-	}
-}
-
-func mustInsertTeam(t *testing.T, pool *pgxpool.Pool, name string) {
-	t.Helper()
-
-	ctx := context.Background()
-	if _, err := pool.Exec(ctx, `INSERT INTO teams (name) VALUES ($1)`, name); err != nil {
-		t.Fatalf("insert team %s: %v", name, err)
-	}
-}
-
-func mustInsertUser(t *testing.T, pool *pgxpool.Pool, user domain.User) {
-	t.Helper()
-
-	ctx := context.Background()
-	_, err := pool.Exec(ctx, `
-		INSERT INTO users (id, username, team_name, is_active)
-		VALUES ($1, $2, $3, $4)
-	`, user.ID, user.Username, user.TeamName, user.IsActive)
-	if err != nil {
-		t.Fatalf("insert user %s: %v", user.ID, err)
 	}
 }

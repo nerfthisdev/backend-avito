@@ -7,8 +7,11 @@ import (
 	"os"
 	"testing"
 
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
+
+const testDBLockKey int64 = 0x5f3759df
 
 // ResetDB truncates all tables to give tests a clean state.
 func ResetDB(t *testing.T, pool *pgxpool.Pool) {
@@ -35,6 +38,8 @@ func NewTestPool(t *testing.T) *pgxpool.Pool {
 		t.Fatal("test db is not set")
 	}
 
+	t.Cleanup(acquireDBLock(t, dsn))
+
 	ctx := context.Background()
 	pool, err := pgxpool.New(ctx, dsn)
 	if err != nil {
@@ -42,4 +47,26 @@ func NewTestPool(t *testing.T) *pgxpool.Pool {
 	}
 
 	return pool
+}
+
+func acquireDBLock(t *testing.T, dsn string) func() {
+	t.Helper()
+
+	ctx := context.Background()
+	conn, err := pgx.Connect(ctx, dsn)
+	if err != nil {
+		t.Fatalf("failed to create lock connection: %v", err)
+	}
+
+	if _, err := conn.Exec(ctx, `SELECT pg_advisory_lock($1)`, testDBLockKey); err != nil {
+		_ = conn.Close(ctx)
+		t.Fatalf("failed to acquire test db lock: %v", err)
+	}
+
+	return func() {
+		if _, err := conn.Exec(context.Background(), `SELECT pg_advisory_unlock($1)`, testDBLockKey); err != nil {
+			t.Fatalf("failed to release test db lock: %v", err)
+		}
+		_ = conn.Close(context.Background())
+	}
 }

@@ -60,7 +60,13 @@ func main() {
 	// DI
 
 	teamRepo := repository.NewTeamRepo(pool)
+	userRepo := repository.NewUserRepo(pool)
+	prRepo := repository.NewPullRequestRepo(pool)
+
 	teamSvc := service.NewTeamService(teamRepo)
+	userSvc := service.NewUserService(userRepo)
+	prSvc := service.NewPullRequestService(prRepo, userRepo)
+	_ = prSvc
 	teamHandlers := httpapi.NewTeamHandler(teamSvc, logg)
 
 	mux := http.NewServeMux()

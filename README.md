@@ -4,6 +4,12 @@
 
 [Load testing](#load-testing)
 
+Как описано в условии все поднимается
+```
+docker compose up
+```
+но если вы хотите запустить отдеальные части задания все описано в [Makefile](./Makefile)
+
 ## Local Setup
 
 ### Requirements
